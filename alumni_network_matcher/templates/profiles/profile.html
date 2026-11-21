@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" class="profile-img rounded-circle mb-3" alt="Profile">
+                {% else %}
+                    <img src="{% static 'images/default-profile.png' %}" class="profile-img rounded-circle mb-3" alt="Profile">
+                {% endif %}
+                <h4>{{ profile.full_name|default:profile.user.email }}</h4>
+                <span class="badge {% if profile.user.role == 'alumni' %}badge-alumni{% else %}badge-student{% endif %}">
+                    {{ profile.user.get_role_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5>About</h5>
+                <p>{{ profile.bio|default:"No bio added yet." }}</p>
+                
+                <hr>
+                <h5>Skills</h5>
+                <p>{{ profile.skills|default:"Not updated" }}</p>
+                
+                {% if profile.user.role == 'alumni' %}
+                <hr>
+                <h5>Current Position</h5>
+                <p><strong>{{ profile.current_job_title }}</strong> at {{ profile.current_company }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

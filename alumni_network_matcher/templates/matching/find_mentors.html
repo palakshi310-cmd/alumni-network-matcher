@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find Mentors - LIET Alumni{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">AI-Powered Mentor Recommendations</h2>
+
+    <!-- Search Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search by name, skills, company..." 
+                           value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'find_mentors' %}" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for mentor in mentors %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        {% if mentor.profile_picture %}
+                            <img src="{{ mentor.profile_picture.url }}" class="rounded-circle me-3" width="70" height="70" style="object-fit: cover;" alt="">
+                        {% else %}
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 70px; height: 70px; font-size: 28px;">
+                                {{ mentor.full_name|slice:":1" }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">{{ mentor.full_name }}</h5>
+                            <small class="text-muted">
+                                {{ mentor.current_job_title }} @ {{ mentor.current_company|default:"Independent" }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- AI Match Score -->
+                    {% if mentor.match_score %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong>AI Match Score</strong>
+                            <span class="fw-bold text-success fs-5">{{ mentor.match_score }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                           <div class="progress-bar bg-success" style="width: {{ mentor.match_score }}%;"></div>
+                         </div>
+                      {% endif %}
+
+                    <p class="small text-muted mb-2">{{ mentor.bio|truncatewords:25|default:"No bio available" }}</p>
+                    
+                    {% if mentor.match_reason %}
+                    <p class="small text-primary"><strong>Why Recommended:</strong> {{ mentor.match_reason }}</p>
+                    {% endif %}
+
+                    <!-- Connection Status & Action Buttons -->
+                    <div class="mt-3">
+                        {% if mentor.connection_status == 'accepted' %}
+                            <div class="alert alert-success py-2 small">
+                                ✅ Connection Accepted
+                            </div>
+                            <a href="{% url 'my_connections' %}" class="btn btn-success w-100 mb-2">
+                                💬 Message Mentor
+                            </a>
+                            <a href="#" class="btn btn-outline-success w-100">📅 Schedule Session</a>
+
+                        {% elif mentor.connection_status == 'pending' %}
+                            <div class="alert alert-warning py-2 small text-center">
+                                ⏳ Request Pending Approval
+                            </div>
+
+                        {% elif mentor.connection_status == 'rejected' %}
+                            <div class="alert alert-danger py-2 small text-center">
+                                ❌ Request Rejected
+                            </div>
+
+                        {% else %}
+                            <!-- No request sent yet -->
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'mentor_detail' mentor.pk %}" 
+                                   class="btn btn-outline-primary flex-fill btn-sm">
+                                    View Profile
+                                </a>
+                                <a href="{% url 'send_connection_request' mentor.pk %}" 
+                                   class="btn btn-primary flex-fill btn-sm">
+                                    Connect Now
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center py-5">
+                <h5>No mentors found matching your criteria.</h5>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

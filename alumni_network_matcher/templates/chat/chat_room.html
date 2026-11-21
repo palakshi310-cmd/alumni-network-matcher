@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat with {{ other_user.profile.full_name|default:other_user.email }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>💬 Chat with {{ other_user.profile.full_name|default:other_user.email }}</h5>
+        </div>
+        <div class="card-body" style="height: 400px; overflow-y: scroll;" id="chat-box">
+            {% for msg in messages %}
+            <div class="mb-2 {% if msg.sender == user %}text-end{% else %}text-start{% endif %}">
+                <small class="text-muted">{{ msg.sender.email }}</small><br>
+                <span class="badge {% if msg.sender == user %}bg-primary{% else %}bg-secondary{% endif %}">
+                    {{ msg.content }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

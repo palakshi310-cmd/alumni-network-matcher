@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - LIET Alumni Network{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center py-5">
+        <h1 class="display-4 fw-bold text-primary">Welcome to LIET Alumni Network</h1>
+        <p class="lead mt-3">Connect with successful alumni • Get personalized mentorship • Boost your career in Media & Journalism</p>
+        
+        <div class="mt-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'find_mentors' %}" class="btn btn-primary btn-lg px-5">Find Mentors Now</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 me-3">Join Now</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg px-5">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+Quick Stats
+<div class="row mt-5 g-4">
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="text-primary">500+</h3>
+            <p class="text-muted">Active Alumni</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="text-primary">1200+</h3>
+            <p class="text-muted">Students Connected</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="text-primary">85%</h3>
+            <p class="text-muted">Match Success Rate</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

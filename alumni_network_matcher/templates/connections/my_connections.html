@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}My Connections{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Mentorship Connections</h2>
+
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#active">Active</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#pending">Pending</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#rejected">Rejected</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Active Mentorships -->
+        <div class="tab-pane fade show active" id="active">
+            {% for conn in active_connections %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>
+                        {% if is_alumni %}
+                            Student: {{ conn.student.profile.full_name|default:conn.student.email }}
+                        {% else %}
+                            Mentor: {{ conn.mentor.profile.full_name|default:conn.mentor.email }}
+                        {% endif %}
+                    </h5>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'chat_room' conn.id %}" class="btn btn-primary btn-sm me-2">
+                            💬 Message
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-sm">
+                            📅 Schedule Session
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No active mentorships yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pending -->
+        <div class="tab-pane fade" id="pending">
+            {% if is_alumni and pending_received %}
+                <h5>Pending Requests from Students</h5>
+                {% for conn in pending_received %}
+                <div class="card mb-3 border-warning">
+                    <div class="card-body">
+                        <h5>From: <strong>{{ conn.student.profile.full_name|default:conn.student.email }}</strong></h5>
+                        <p>{{ conn.message|default:"No message" }}</p>
+                        <a href="{% url 'handle_request' conn.id 'accept' %}" class="btn btn-success">Accept</a>
+                        <a href="{% url 'handle_request' conn.id 'reject' %}" class="btn btn-danger">Reject</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif pending_sent %}
+                <h5>Your Pending Requests</h5>
+                {% for conn in pending_sent %}
+                <div class="alert alert-info">
+                    Waiting for response from <strong>{{ conn.mentor.profile.full_name|default:conn.mentor.email }}</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No pending requests.</p>
+            {% endif %}
+        </div>
+
+        <!-- Rejected -->
+        <div class="tab-pane fade" id="rejected">
+            {% for conn in rejected_requests %}
+            <div class="alert alert-danger">
+                Request to <strong>{{ conn.mentor.profile.full_name|default:conn.mentor.email }}</strong> was rejected.
+            </div>
+            {% empty %}
+            <p>No rejected requests.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
